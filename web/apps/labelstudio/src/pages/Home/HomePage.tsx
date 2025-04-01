@@ -10,6 +10,7 @@ import { CreateProject } from "../CreateProject/CreateProject";
 import { InviteLink } from "../Organization/PeoplePage/InviteLink";
 import { Heading, Sub } from "@humansignal/typography";
 import { useHistory } from "react-router";
+import { useTranslation } from 'react-i18next';
 
 const PROJECTS_TO_SHOW = 10;
 
@@ -52,6 +53,7 @@ const actions = [
 type Action = (typeof actions)[number]["type"];
 
 export const HomePage: Page = () => {
+  const { t } = useTranslation();
   const api = useAPI();
   const history = useHistory();
   const [creationDialogOpen, setCreationDialogOpen] = useState(false);
@@ -83,8 +85,8 @@ export const HomePage: Page = () => {
       <div className="grid grid-cols-[minmax(0,1fr)_450px] gap-6">
         <section className="flex flex-col gap-6">
           <div className="flex flex-col gap-1">
-            <Heading size={1}>Welcome 👋</Heading>
-            <Sub>Let's get you started.</Sub>
+            <Heading size={1}>{t('home.welcome')} 👋</Heading>
+            <Sub>{t('home.getStarted')}</Sub>
           </div>
           <div className="flex justify-start gap-4">
             {actions.map((action) => {
@@ -96,7 +98,7 @@ export const HomePage: Page = () => {
                   onClick={handleActions(action.type)}
                 >
                   <action.icon className="text-primary-icon" />
-                  {action.title}
+                  {t(`actions.${action.type}`)}
                 </Button>
               );
             })}
@@ -106,9 +108,9 @@ export const HomePage: Page = () => {
             title={
               data && data?.count > 0 ? (
                 <>
-                  Recent Projects{" "}
+                  {t('projects.recentProjects')}{" "}
                   <a href="/projects" className="text-lg font-normal hover:underline">
-                    View All
+                    {t('projects.viewAll')}
                   </a>
                 </>
               ) : null
@@ -119,7 +121,7 @@ export const HomePage: Page = () => {
                 <Spinner />
               </div>
             ) : isError ? (
-              <div className="h-64 flex justify-center items-center">can't load projects</div>
+              <div className="h-64 flex justify-center items-center">{t('common.error')}</div>
             ) : isSuccess && data.results.length === 0 ? (
               <div className="flex flex-col justify-center items-center border border-primary-border-subtle bg-primary-emphasis-subtle rounded-lg h-64">
                 <div
@@ -129,10 +131,10 @@ export const HomePage: Page = () => {
                 >
                   <IconFolderOpen />
                 </div>
-                <Heading size={2}>Create your first project</Heading>
-                <Sub>Import your data and set up the labeling interface to start annotating</Sub>
+                <Heading size={2}>{t('projects.createFirstProject')}</Heading>
+                <Sub>{t('projects.setupInstructions')}</Sub>
                 <Button className="mt-4" onClick={() => setCreationDialogOpen(true)}>
-                  Create Project
+                  {t('projects.createProject')}
                 </Button>
               </div>
             ) : isSuccess && data.results.length > 0 ? (
@@ -146,7 +148,7 @@ export const HomePage: Page = () => {
         </section>
         <section className="flex flex-col gap-6">
           <HeidiTips collection="projectSettings" />
-          <SimpleCard title="Resources" description="Learn, explore and get help">
+          <SimpleCard title={t('resources.title')} description={t('resources.description')}>
             <ul>
               {resources.map((link) => {
                 return (
@@ -167,7 +169,7 @@ export const HomePage: Page = () => {
           </SimpleCard>
           <div className="flex gap-2 items-center">
             <IconHumanSignal />
-            <span className="text-neutral-content-subtle">Label Studio Version: Community</span>
+            <span className="text-neutral-content-subtle">{t('common.version')}: Community</span>
           </div>
         </section>
       </div>
@@ -186,6 +188,7 @@ function ProjectSimpleCard({
 }: {
   project: APIProject;
 }) {
+  const { t } = useTranslation();
   const finished = project.queue_done ?? 0;
   const total = project.queue_total ?? 0;
   const progress = (total > 0 ? finished / total : 0) * 100;
@@ -201,7 +204,7 @@ function ProjectSimpleCard({
         <div className="flex flex-col gap-1">
           <span className="text-neutral-content">{project.title}</span>
           <div className="text-neutral-content-subtler text-sm">
-            {finished} of {total} Tasks ({total > 0 ? Math.round((finished / total) * 100) : 0}%)
+            {t('projects.progress', { finished, total, percentage: total > 0 ? Math.round((finished / total) * 100) : 0 })}
           </div>
         </div>
         <div className="bg-neutral-surface rounded-full overflow-hidden w-full h-2 shadow-neutral-border-subtle shadow-border-1">
