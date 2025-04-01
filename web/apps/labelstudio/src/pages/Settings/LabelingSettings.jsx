@@ -4,8 +4,10 @@ import { useProject } from "../../providers/ProjectProvider";
 import { FF_UNSAVED_CHANGES, isFF } from "../../utils/feature-flags";
 import { isEmptyString } from "../../utils/helpers";
 import { ConfigPage } from "../CreateProject/Config/Config";
+import { useTranslation } from "react-i18next";
 
 export const LabelingSettings = () => {
+  const { t } = useTranslation();
   const { project, fetchProject, updateProject } = useProject();
   const [config, setConfig] = useState("");
   const [essentialDataChanged, setEssentialDataChanged] = useState(false);
@@ -85,6 +87,13 @@ export const LabelingSettings = () => {
       onSaveClick={onSave}
       onValidate={onValidate}
       hasChanges={hasChanges}
+      title={t('settings.labeling.title')}
+      description={t('settings.labeling.description')}
+      configTitle={t('settings.labeling.config.title')}
+      configDescription={t('settings.labeling.config.description')}
+      saveButtonText={t('settings.labeling.config.save')}
+      validateButtonText={t('settings.labeling.config.validate')}
+      resetButtonText={t('settings.labeling.config.reset')}
     />
   );
 };

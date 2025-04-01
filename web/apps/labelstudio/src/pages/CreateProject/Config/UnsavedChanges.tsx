@@ -3,21 +3,18 @@ import { Button } from "../../../components";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "../../../components/LeaveBlocker/LeaveBlocker";
 import { modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
+import { useTranslation } from "react-i18next";
 
 type SaveAndLeaveButtonProps = {
   onSave: () => void;
   text?: string;
 };
-const SaveAndLeaveButton = ({ onSave, text = "Save and Leave" }: SaveAndLeaveButtonProps) => {
-  const [saving, setSaving] = useState(false);
-  const saveHandler = useCallback(async () => {
-    setSaving(true);
-    await onSave();
-    setSaving(false);
-  }, [onSave]);
+
+const SaveAndLeaveButton = ({ onSave, text }: SaveAndLeaveButtonProps) => {
+  const { t } = useTranslation();
   return (
-    <Button onClick={saveHandler} size="compact" look="primary" waiting={saving}>
-      {text}
+    <Button onClick={onSave} look="primary" size="compact">
+      {text ?? t('createProject.unsavedChanges.save')}
     </Button>
   );
 };
@@ -40,10 +37,11 @@ export const unsavedChangesModal = ({
   cancelText,
   discardText,
   okText,
-  title = "You have unsaved changes.",
-  body = "Would you like to save them before leaving?",
+  title,
+  body,
   ...props
 }: UnsavedChangesModalProps) => {
+  const { t } = useTranslation();
   let modalInstance: any = undefined;
   const saveAndLeave = async () => {
     await onSave?.();
@@ -51,11 +49,11 @@ export const unsavedChangesModal = ({
   };
   modalInstance = modal({
     ...props,
-    title,
-    body: () => <>{body}</>,
+    title: title ?? t('createProject.unsavedChanges.title'),
+    body: () => <>{body ?? t('createProject.unsavedChanges.body')}</>,
     allowClose: true,
     footer: (
-      <Space align="end">
+      <Space align="end" size="small" className="modal-footer">
         <Button
           onClick={() => {
             onCancel?.();
@@ -64,7 +62,7 @@ export const unsavedChangesModal = ({
           size="compact"
           autoFocus
         >
-          {cancelText ?? "Cancel"}
+          {cancelText ?? t('createProject.unsavedChanges.cancel')}
         </Button>
 
         {onDiscard && (
@@ -76,7 +74,7 @@ export const unsavedChangesModal = ({
             size="compact"
             look="danger"
           >
-            {discardText ?? "Discard and leave"}
+            {discardText ?? t('createProject.unsavedChanges.discard')}
           </Button>
         )}
 

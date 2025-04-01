@@ -1,11 +1,13 @@
 import React from "react";
 import { PropTypes } from "prop-types";
 import { Tag } from "antd";
+import { useTranslation } from "react-i18next";
 
 import styles from "./Dialog.module.scss";
 
 export default class DialogView extends React.Component {
   render() {
+    const { t } = useTranslation();
     let selectedStyle = `${styles.block}`;
     let hint;
     let bgColor;
@@ -23,7 +25,7 @@ export default class DialogView extends React.Component {
       selectedStyle = `${selectedStyle} ${styles.block_selected}`;
       hint = (
         <div>
-          <Tag color="magenta">Selected Message</Tag>
+          <Tag color="magenta">{t('dialog.selectedMessage')}</Tag>
         </div>
       );
 

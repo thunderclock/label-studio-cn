@@ -10,8 +10,10 @@ import { Elem } from "../../../utils/bem";
 import { useRefresh } from "../../../utils/hooks";
 import { ImportPage } from "./Import";
 import { useImportPage } from "./useImportPage";
+import { useTranslation } from "react-i18next";
 
 export const Inner = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const location = useFixedLocation();
   const modal = useRef();
@@ -63,7 +65,7 @@ export const Inner = () => {
 
   return (
     <Modal
-      title="Import data"
+      title={t('createProject.import.title')}
       ref={modal}
       onHide={() => backToDM()}
       closeOnClickOutside={false}
@@ -73,15 +75,15 @@ export const Inner = () => {
     >
       <Modal.Header divided>
         <Elem block="modal" name="title">
-          Import Data
+          {t('createProject.import.title')}
         </Elem>
 
         <Space>
           <Button waiting={waiting} onClick={onCancel}>
-            Cancel
+            {t('createProject.buttons.cancel')}
           </Button>
           <Button look="primary" onClick={onFinish} waiting={waiting || uploading} disabled={uploadDisabled}>
-            Import
+            {waiting || uploading ? t('createProject.buttons.importing') : t('createProject.buttons.import')}
           </Button>
         </Space>
       </Modal.Header>
@@ -98,6 +100,7 @@ export const Inner = () => {
     </Modal>
   );
 };
+
 export const ImportModal = () => {
   return (
     <ProjectProvider>

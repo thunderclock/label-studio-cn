@@ -7,10 +7,12 @@ import { Userpic } from "@humansignal/ui";
 import { Button, Dropdown, Menu, Pagination } from "../../components";
 import { Block, Elem } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
 
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
+  const { t } = useTranslation();
   return (
     <>
       <Elem name="list">
@@ -21,7 +23,7 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
       <Elem name="pages">
         <Pagination
           name="projects-list"
-          label="Projects"
+          label={t('projects.pagination.label')}
           page={currentPage}
           totalItems={totalItems}
           urlParamName="page"
@@ -35,21 +37,23 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
 };
 
 export const EmptyProjectsList = ({ openModal }) => {
+  const { t } = useTranslation();
   return (
     <Block name="empty-projects-page">
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">
-        Heidi doesn’t see any projects here!
+        {t('projects.emptyState.title')}
       </Elem>
-      <p>Create one and start labeling your data.</p>
+      <p>{t('projects.emptyState.description')}</p>
       <Elem name="action" tag={Button} onClick={openModal} look="primary">
-        Create Project
+        {t('projects.emptyState.createButton')}
       </Elem>
     </Block>
   );
 };
 
 const ProjectCard = ({ project }) => {
+  const { t } = useTranslation();
   const color = useMemo(() => {
     return DEFAULT_CARD_COLORS.includes(project.color) ? null : project.color;
   }, [project]);
@@ -68,7 +72,7 @@ const ProjectCard = ({ project }) => {
       <Block name="project-card" mod={{ colored: !!color }} style={projectColors}>
         <Elem name="header">
           <Elem name="title">
-            <Elem name="title-text">{project.title ?? "New project"}</Elem>
+            <Elem name="title-text">{project.title ?? t('projects.card.newProject')}</Elem>
 
             <Elem
               name="menu"
@@ -80,8 +84,8 @@ const ProjectCard = ({ project }) => {
               <Dropdown.Trigger
                 content={
                   <Menu contextual>
-                    <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
-                    <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
+                    <Menu.Item href={`/projects/${project.id}/settings`}>{t('projects.card.settings')}</Menu.Item>
+                    <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>{t('projects.card.label')}</Menu.Item>
                   </Menu>
                 }
               >
@@ -92,7 +96,7 @@ const ProjectCard = ({ project }) => {
           <Elem name="summary">
             <Elem name="annotation">
               <Elem name="total">
-                {project.finished_task_number} / {project.task_number}
+                {t('projects.card.total', { finished: project.finished_task_number, total: project.task_number })}
               </Elem>
               <Elem name="detail">
                 <Elem name="detail-item" mod={{ type: "completed" }}>
@@ -113,7 +117,9 @@ const ProjectCard = ({ project }) => {
         </Elem>
         <Elem name="description">{project.description}</Elem>
         <Elem name="info">
-          <Elem name="created-date">{format(new Date(project.created_at), "dd MMM ’yy, HH:mm")}</Elem>
+          <Elem name="created-date">
+            {t('projects.card.createdAt', { date: format(new Date(project.created_at), "dd MMM 'yy, HH:mm") })}
+          </Elem>
           <Elem name="created-by">
             <Userpic src="#" user={project.created_by} showUsername />
           </Elem>

@@ -1,10 +1,12 @@
 import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
 import { PeoplePage } from "./PeoplePage/PeoplePage";
 import { WebhookPage } from "../WebhookPage/WebhookPage";
+import { useTranslation } from 'react-i18next';
 
 const ALLOW_ORGANIZATION_WEBHOOKS = window.APP_SETTINGS.flags?.allow_organization_webhooks;
 
 const MenuLayout = ({ children, ...routeProps }) => {
+  const { t } = useTranslation();
   const menuItems = [PeoplePage];
 
   if (ALLOW_ORGANIZATION_WEBHOOKS) {

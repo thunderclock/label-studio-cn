@@ -16,9 +16,11 @@ import { Input, Select, TextArea } from "../../components/Form";
 import { Caption } from "../../components/Caption/Caption";
 import { FF_LSDV_E_297, isFF } from "../../utils/feature-flags";
 import { createURL } from "../../components/HeidiTips/utils";
+import { useTranslation } from "react-i18next";
 
-const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) =>
-  !show ? null : (
+const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true }) => {
+  const { t } = useTranslation();
+  return !show ? null : (
     <form
       className={cn("project-name")}
       onSubmit={(e) => {
@@ -27,7 +29,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
       }}
     >
       <div className="field field--wide">
-        <label htmlFor="project_name">Project Name</label>
+        <label htmlFor="project_name">{t('createProject.projectName')}</label>
         <Input
           name="name"
           id="project_name"
@@ -38,11 +40,11 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
         {error && <span className="error">{error}</span>}
       </div>
       <div className="field field--wide">
-        <label htmlFor="project_description">Description</label>
+        <label htmlFor="project_description">{t('createProject.description')}</label>
         <TextArea
           name="description"
           id="project_description"
-          placeholder="Optional description of your project"
+          placeholder={t('createProject.description')}
           rows="4"
           style={{ minHeight: 100 }}
           value={description}
@@ -52,12 +54,12 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
       {isFF(FF_LSDV_E_297) && (
         <div className="field field--wide">
           <label>
-            Workspace
+            {t('createProject.workspace.title')}
             <EnterpriseBadge className="ml-2" />
           </label>
-          <Select placeholder="Select an option" disabled options={[]} />
+          <Select placeholder={t('createProject.workspace.placeholder')} disabled options={[]} />
           <Caption>
-            Simplify project management by organizing projects into workspaces.
+            {t('createProject.workspace.description')}
             <a
               href={createURL(
                 "https://docs.humansignal.com/guide/manage_projects#Create-workspaces-to-organize-projects",
@@ -69,7 +71,7 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
               target="_blank"
               rel="noreferrer"
             >
-              Learn more
+              {t('createProject.workspace.learnMore')}
             </a>
           </Caption>
           <HeidiTips collection="projectCreation" />
@@ -77,8 +79,10 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
       )}
     </form>
   );
+};
 
 export const CreateProject = ({ onClose }) => {
+  const { t } = useTranslation();
   const [step, _setStep] = React.useState("name"); // name | import | config
   const [waiting, setWaitingStatus] = React.useState(false);
 
@@ -110,9 +114,9 @@ export const CreateProject = ({ onClose }) => {
   const rootClass = cn("create-project");
   const tabClass = rootClass.elem("tab");
   const steps = {
-    name: <span className={tabClass.mod({ disabled: !!error })}>Project Name</span>,
-    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>Data Import</span>,
-    config: "Labeling Setup",
+    name: <span className={tabClass.mod({ disabled: !!error })}>{t('createProject.steps.name')}</span>,
+    import: <span className={tabClass.mod({ disabled: uploadDisabled })}>{t('createProject.steps.import')}</span>,
+    config: t('createProject.steps.config'),
   };
 
   // name intentionally skipped from deps:
@@ -191,12 +195,12 @@ export const CreateProject = ({ onClose }) => {
     <Modal onHide={onDelete} closeOnClickOutside={false} allowToInterceptEscape fullscreen visible bare>
       <div className={rootClass}>
         <Modal.Header>
-          <h1>Create Project</h1>
+          <h1>{t('createProject.title')}</h1>
           <ToggleItems items={steps} active={step} onSelect={setStep} />
 
           <Space>
             <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>
-              Delete
+              {t('createProject.buttons.delete')}
             </Button>
             <Button
               look="primary"
@@ -205,7 +209,7 @@ export const CreateProject = ({ onClose }) => {
               waiting={waiting || uploading}
               disabled={!project || uploadDisabled || error}
             >
-              Save
+              {waiting || uploading ? t('createProject.buttons.saving') : t('createProject.buttons.save')}
             </Button>
           </Space>
         </Modal.Header>

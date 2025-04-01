@@ -18,8 +18,10 @@ import { IconPlus } from "@humansignal/icons";
 import { useToast } from "@humansignal/ui";
 import { InviteLink } from "./InviteLink";
 import { debounce } from "@humansignal/core/lib/utils/debounce";
+import { useTranslation } from 'react-i18next';
 
 const InvitationModal = ({ link }) => {
+  const { t } = useTranslation();
   return (
     <Block name="invite">
       <Input
@@ -31,8 +33,7 @@ const InvitationModal = ({ link }) => {
       />
 
       <Description style={{ marginTop: 16 }}>
-        Invite people to join your Label Studio instance. People that you invite have full access to all of your
-        projects.{" "}
+        {t('organization.people.invitation.description')}{" "}
         <a
           href="https://labelstud.io/guide/signup.html"
           target="_blank"
@@ -41,7 +42,7 @@ const InvitationModal = ({ link }) => {
             __lsa("docs.organization.add_people.learn_more", { href: "https://labelstud.io/guide/signup.html" })
           }
         >
-          Learn more
+          {t('common.learnMore')}
         </a>
         .
       </Description>
@@ -50,6 +51,7 @@ const InvitationModal = ({ link }) => {
 };
 
 export const PeoplePage = () => {
+  const { t } = useTranslation();
   const api = useAPI();
   const inviteModal = useRef();
   const apiSettingsModal = useRef();
@@ -71,18 +73,18 @@ export const PeoplePage = () => {
 
   const apiTokensSettingsModalProps = useMemo(
     () => ({
-      title: "API Token Settings",
+      title: t('organization.people.apiTokens.title'),
       style: { width: 480 },
       body: () => (
         <TokenSettingsModal
           onSaved={() => {
-            toast.show({ message: "API Token settings saved" });
+            toast.show({ message: t('organization.people.apiTokens.saved') });
             apiSettingsModal.current?.close();
           }}
         />
       ),
     }),
-    [],
+    [t],
   );
 
   const showApiTokenSettingsModal = useCallback(() => {
@@ -101,9 +103,13 @@ export const PeoplePage = () => {
           <Space />
 
           <Space>
-            {isFF(FF_AUTH_TOKENS) && <Button onClick={showApiTokenSettingsModal}>API Tokens Settings</Button>}
+            {isFF(FF_AUTH_TOKENS) && (
+              <Button onClick={showApiTokenSettingsModal}>
+                {t('organization.people.apiTokens.settings')}
+              </Button>
+            )}
             <Button icon={<IconPlus />} primary onClick={() => setInvitationOpen(true)}>
-              Add People
+              {t('organization.people.addPeople')}
             </Button>
           </Space>
         </Space>

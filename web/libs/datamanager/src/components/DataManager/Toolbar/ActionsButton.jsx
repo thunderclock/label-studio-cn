@@ -8,6 +8,7 @@ import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
 import { Modal } from "../../Common/Modal/ModalPopup";
+import { useTranslation } from "react-i18next";
 import "./ActionsButton.scss";
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);
@@ -31,6 +32,7 @@ const buildDialogContent = (text, form, formRef) => {
 
 export const ActionsButton = injector(
   observer(({ store, size, hasSelected, ...rest }) => {
+    const { t } = useTranslation();
     const formRef = useRef();
     const selectedCount = store.currentView.selectedCount;
     const actions = store.availableActions.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
@@ -41,7 +43,7 @@ export const ActionsButton = injector(
         const dialog = Modal[dialogType] ?? Modal.confirm;
 
         dialog({
-          title: title ? title : destructive ? "Destructive action" : "Confirm action",
+          title: title ? title : destructive ? t('dialog.destructiveAction') : t('dialog.confirmAction'),
           body: buildDialogContent(text, form, formRef),
           buttonLook: destructive ? "destructive" : "primary",
           onOk() {

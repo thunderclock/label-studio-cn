@@ -10,8 +10,10 @@ import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { FF_LSDV_E_297, isFF } from "../../utils/feature-flags";
 import { createURL } from "../../components/HeidiTips/utils";
 import { Caption } from "../../components/Caption/Caption";
+import { useTranslation } from "react-i18next";
 
 export const GeneralSettings = () => {
+  const { t } = useTranslation();
   const { project, fetchProject } = useContext(ProjectContext);
 
   const updateProject = useCallback(() => {
@@ -21,29 +23,29 @@ export const GeneralSettings = () => {
   const colors = ["#FDFDFC", "#FF4C25", "#FF750F", "#ECB800", "#9AC422", "#34988D", "#617ADA", "#CC6FBE"];
 
   const samplings = [
-    { value: "Sequential", label: "Sequential", description: "Tasks are ordered by Task ID" },
-    { value: "Uniform", label: "Random", description: "Tasks are chosen with uniform random" },
+    { value: "Sequential", label: t('settings.general.taskSampling.sequential.label'), description: t('settings.general.taskSampling.sequential.description') },
+    { value: "Uniform", label: t('settings.general.taskSampling.uniform.label'), description: t('settings.general.taskSampling.uniform.description') },
   ];
 
   return (
     <Block name="general-settings">
       <Elem name={"wrapper"}>
-        <h1>General Settings</h1>
+        <h1>{t('settings.general.title')}</h1>
         <Block name="settings-wrapper">
           <Form action="updateProject" formData={{ ...project }} params={{ pk: project.id }} onSubmit={updateProject}>
             <Form.Row columnCount={1} rowGap="16px">
-              <Input name="title" label="Project Name" />
+              <Input name="title" label={t('settings.general.projectName')} />
 
-              <TextArea name="description" label="Description" style={{ minHeight: 128 }} />
+              <TextArea name="description" label={t('settings.general.description')} style={{ minHeight: 128 }} />
               {isFF(FF_LSDV_E_297) && (
                 <Block name="workspace-placeholder">
                   <Elem name="badge-wrapper">
-                    <Elem name="title">Workspace</Elem>
+                    <Elem name="title">{t('settings.general.workspace.title')}</Elem>
                     <EnterpriseBadge className="ml-2" />
                   </Elem>
-                  <Select placeholder="Select an option" disabled options={[]} />
+                  <Select placeholder={t('settings.general.workspace.placeholder')} disabled options={[]} />
                   <Caption>
-                    Simplify project management by organizing projects into workspaces.{" "}
+                    {t('settings.general.workspace.description')}{" "}
                     <a
                       target="_blank"
                       href={createURL(
@@ -55,12 +57,12 @@ export const GeneralSettings = () => {
                       )}
                       rel="noreferrer"
                     >
-                      Learn more
+                      {t('common.learnMore')}
                     </a>
                   </Caption>
                 </Block>
               )}
-              <RadioGroup name="color" label="Color" size="large" labelProps={{ size: "large" }}>
+              <RadioGroup name="color" label={t('settings.general.color')} size="large" labelProps={{ size: "large" }}>
                 {colors.map((color) => (
                   <RadioGroup.Button key={color} value={color}>
                     <Block name="color" style={{ "--background": color }} />
@@ -68,7 +70,7 @@ export const GeneralSettings = () => {
                 ))}
               </RadioGroup>
 
-              <RadioGroup label="Task Sampling" labelProps={{ size: "large" }} name="sampling" simple>
+              <RadioGroup label={t('settings.general.taskSampling.title')} labelProps={{ size: "large" }} name="sampling" simple>
                 {samplings.map(({ value, label, description }) => (
                   <RadioGroup.Button
                     key={value}
@@ -83,13 +85,13 @@ export const GeneralSettings = () => {
                     value=""
                     label={
                       <>
-                        Uncertainty sampling <EnterpriseBadge className="ml-2" />
+                        {t('settings.general.taskSampling.uncertainty.label')} <EnterpriseBadge className="ml-2" />
                       </>
                     }
                     disabled
                     description={
                       <>
-                        Tasks are chosen according to model uncertainty score (active learning mode).{" "}
+                        {t('settings.general.taskSampling.uncertainty.description')}{" "}
                         <a
                           target="_blank"
                           href={createURL("https://docs.humansignal.com/guide/active_learning", {
@@ -98,7 +100,7 @@ export const GeneralSettings = () => {
                           })}
                           rel="noreferrer"
                         >
-                          Learn more
+                          {t('common.learnMore')}
                         </a>
                       </>
                     }
@@ -109,10 +111,10 @@ export const GeneralSettings = () => {
 
             <Form.Actions>
               <Form.Indicator>
-                <span case="success">Saved!</span>
+                <span case="success">{t('common.saved')}</span>
               </Form.Indicator>
               <Button type="submit" look="primary" style={{ width: 120 }}>
-                Save
+                {t('common.save')}
               </Button>
             </Form.Actions>
           </Form>
