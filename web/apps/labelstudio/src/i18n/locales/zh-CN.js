@@ -9,7 +9,7 @@ export default {
     delete: '删除',
     edit: '编辑',
     back: '返回',
-    version: 'Label Studio 版本',
+    version: '标注平台 版本',
     settings: '设置',
     create: '创建',
     add: '添加',
@@ -21,7 +21,7 @@ export default {
   },
   home: {
     title: '首页',
-    welcome: '欢迎使用 Label Studio',
+    welcome: '欢迎使用标注平台',
     getStarted: '让我们开始吧'
   },
   projects: {
@@ -68,7 +68,7 @@ export default {
       },
       invitation: {
         title: '邀请成员',
-        description: '邀请成员加入你的 Label Studio 实例。你邀请的成员将拥有所有项目的完整访问权限。',
+        description: '邀请成员加入你的标注平台实例。你邀请的成员将拥有所有项目的完整访问权限。',
         copyLink: '复制邀请链接',
         selectLink: '选择邀请链接'
       }
