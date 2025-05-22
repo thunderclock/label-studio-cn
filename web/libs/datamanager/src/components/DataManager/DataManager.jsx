@@ -11,6 +11,7 @@ import { FiltersSidebar } from "../Filters/FiltersSidebar/FilterSidebar";
 import { DataView } from "../MainView";
 import "./DataManager.scss";
 import { Toolbar } from "./Toolbar/Toolbar";
+import { useTranslation } from 'react-i18next';
 
 const tabContentCN = cn("tabs-dm-content");
 
@@ -43,31 +44,28 @@ const switchInjector = inject(({ store }) => {
   };
 });
 
-const ProjectSummary = summaryInjector((props) => {
-  return (
-    <Space size="large" style={{ paddingRight: "1em" }}>
-      {props.cloudSync && (
-        <Space size="small" style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}>
-          Storage sync
-          <Spinner size="small" />
-        </Space>
-      )}
-      <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
-        <Space size="compact">
-          <span>
-            Tasks: <span title="Filtered tasks">{props.totalFoundTasks}</span> /{" "}
-            <span title="Total tasks in the project">{props.totalTasks}</span>
-          </span>
-          <span>Submitted annotations: {props.totalAnnotations}</span>
-          <span>Predictions: {props.totalPredictions}</span>
-        </Space>
-      </span>
-    </Space>
-  );
-});
+const ProjectSummary = summaryInjector(
+  observer(({ totalTasks, totalFoundTasks, totalAnnotations, totalPredictions, cloudSync }) => {
+    const { t } = useTranslation();
+    return (
+      <Space size="small">
+        <Interface name="summary">
+          <Space size="small">
+            <span>{t('projects.summary.totalTasks', { count: totalTasks })}</span>
+            <span>{t('projects.summary.foundTasks', { count: totalFoundTasks })}</span>
+            <span>{t('projects.summary.annotations', { count: totalAnnotations })}</span>
+            <span>{t('projects.summary.predictions', { count: totalPredictions })}</span>
+            {cloudSync && <span>{t('projects.summary.syncing')}</span>}
+          </Space>
+        </Interface>
+      </Space>
+    );
+  }),
+);
 
 const TabsSwitch = switchInjector(
   observer(({ sdk, views, tabs, selectedKey }) => {
+    const { t } = useTranslation();
     const editable = sdk.tabControls;
 
     const onDragEnd = useCallback((result) => {

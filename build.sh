@@ -11,13 +11,16 @@ fi
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+# 创建新的构建器实例（如果不存在）
+docker buildx create --name mybuilder --use || true
+
 # 构建镜像
-docker buildx build \
+docker build \
     --platform linux/amd64 \
     --build-arg BUILDKIT_INLINE_CACHE=1 \
     --build-arg DOCKER_BUILDKIT=1 \
-    --network host \
     --no-cache \
+    --pull=false \
     --load \
     -t label-studio-cn:v1.0.1 .
 
