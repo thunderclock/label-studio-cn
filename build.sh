@@ -19,6 +19,14 @@ docker build \
     --platform linux/amd64 \
     --build-arg BUILDKIT_INLINE_CACHE=1 \
     --build-arg DOCKER_BUILDKIT=1 \
+    --build-arg YARN_NETWORK_TIMEOUT=1200000 \
+    --build-arg PIP_DEFAULT_TIMEOUT=120 \
+    --build-arg PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple \
+    --build-arg POETRY_SOURCE=https://mirrors.aliyun.com/pypi/simple/ \
+    --build-arg POETRY_HTTP_TIMEOUT=120 \
+    --build-arg NPM_REGISTRY=https://registry.npmmirror.com \
+    --build-arg YARN_REGISTRY=https://registry.npmmirror.com \
+    --build-arg NODE_OPTIONS="--max-old-space-size=4096" \
     --no-cache \
     --pull=false \
     --load \

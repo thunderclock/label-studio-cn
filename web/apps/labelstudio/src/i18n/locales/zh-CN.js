@@ -104,52 +104,76 @@ export default {
         }
       }
     },
-    dangerZone: {
-      title: '危险区域',
-      description: '请谨慎执行这些操作。在此页面执行的操作无法撤销。请确保你的数据已备份。',
-      deleteAnnotations: '删除 {{count}} 个标注',
-      deleteTasks: '删除 {{count}} 个任务',
-      deletePredictions: '删除 {{count}} 个预测',
-      resetCache: {
-        label: '重置缓存',
-        help: '重置缓存可能有助于解决以下情况：当你无法修改标注配置（由于现有标签的验证错误），但你确信这些标签不存在时。你可以使用此操作重置缓存并重试。'
-      },
-      dropTabs: {
-        label: '删除所有标签页',
-        help: '如果数据管理器无法加载，删除所有数据管理器标签页可能会有所帮助。'
-      },
-      deleteProject: {
-        label: '删除项目',
-        help: '删除项目将从数据库中移除所有任务、标注和项目数据。',
-        confirmation: '你即将删除所有内容。此操作无法撤销。'
-      }
-    },
     labeling: {
       title: '标注界面',
-      description: '配置项目的标注界面。你可以添加和配置标注工具，设置标注规则等。',
+      description: '配置标注界面的显示和行为',
       config: {
-        title: '配置',
-        description: '使用 XML 配置标注界面。',
+        title: '标注配置',
+        description: '配置标注界面的标签和工具',
         save: '保存配置',
         validate: '验证配置',
         reset: '重置配置'
       }
     },
     annotation: {
-      title: '标注设置',
+      title: '标注',
       instructions: {
         title: '标注说明',
-        description: '编写说明以帮助用户完成标注任务。',
-        details: '说明字段支持 HTML 标记，允许使用图片和 iframe（PDF）。',
-        showBeforeLabeling: '标注前显示'
+        description: '为标注者提供详细的标注指南',
+        details: '这些说明将在标注过程中显示给标注者',
+        showBeforeLabeling: '在开始标注前显示说明'
       },
       prelabeling: {
         title: '预标注',
         usePredictions: {
-          label: '使用预测进行预标注',
-          description: '启用并选择要用于预标注的预测集。'
+          label: '使用模型预测',
+          description: '使用机器学习模型的预测结果进行预标注'
         }
       }
+    },
+    ml: {
+      title: '机器学习',
+      description: '配置机器学习模型和预测',
+      empty: {
+        title: '连接您的第一个模型',
+        description: '连接机器学习模型以生成预测。这些预测可以并排比较，用于高效的预标注，并帮助主动学习，引导用户进行最有影响力的标注任务。',
+        addButton: '连接模型'
+      },
+      connectedModel: {
+        description: '已检测到连接的模型！如果您希望从此模型获取预测，请按照以下步骤操作：',
+        step1: '导航到数据管理器',
+        step2: '选择所需的任务',
+        step3: '从操作菜单中选择获取预测'
+      },
+      prelabeling: {
+        description: '如果您想使用模型预测进行预标注，请在',
+        link: '标注设置'
+      },
+      configuration: '配置',
+      training: {
+        label: '在提交标注时开始模型训练',
+        description: '此选项将向 /train 发送包含标注信息的请求。您可以使用此功能启用主动学习循环。您也可以通过模型卡片中的模型菜单手动开始训练。'
+      }
+    },
+    storage: {
+      title: '云存储',
+      description: '使用云存储或数据库存储作为标注任务的来源或已完成标注的目标',
+      source: {
+        title: '源云存储',
+        button: '添加源存储'
+      },
+      target: {
+        title: '目标云存储',
+        button: '添加目标存储'
+      }
+    },
+    dangerZone: {
+      title: '危险区域',
+      description: '这些操作不可逆，请谨慎操作',
+      delete: '删除项目',
+      reset: '重置项目',
+      deleteHelp: '删除项目将永久删除所有数据，包括标注、任务和设置。此操作无法撤销。',
+      resetHelp: '重置项目将清除所有标注数据，但保留项目设置和任务。此操作无法撤销。'
     }
   },
   actions: {
@@ -204,5 +228,44 @@ export default {
       discard: '放弃并离开',
       cancel: '取消'
     }
-  }
-}; 
+  },
+  breadcrumbs: {
+    home: '首页',
+    projects: '项目',
+    data: '数据',
+    settings: '设置',
+    organization: '组织',
+    people: '人员',
+    model: '模型',
+    export: '导出',
+    import: '导入',
+    labeling: '标注',
+    review: '审核',
+    history: '历史',
+    members: '成员',
+    integrations: '集成',
+    webhooks: 'Webhooks',
+    api: 'API',
+    storage: '存储',
+    ml: '机器学习',
+    predictions: '预测',
+    versions: '版本',
+    tasks: '任务',
+    annotations: '标注',
+    comments: '评论',
+    activity: '活动',
+    metrics: '指标',
+    quality: '质量',
+    performance: '性能',
+    profile: '个人资料',
+    account: '账户',
+    security: '安全',
+    notifications: '通知',
+    billing: '账单',
+    help: '帮助',
+    documentation: '文档',
+    support: '支持',
+    feedback: '反馈',
+    about: '关于',
+  },
+};

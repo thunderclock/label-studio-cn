@@ -13,13 +13,15 @@ import { CustomBackendForm } from "./Forms";
 import { TestRequest } from "./TestRequest";
 import { StartModelTraining } from "./StartModelTraining";
 import { Block, Elem } from "../../../utils/bem";
+import { useTranslation } from "react-i18next";
 import "./MachineLearningSettings.scss";
 
 export const MachineLearningSettings = () => {
+  const { t } = useTranslation();
   const api = useAPI();
   const { project, fetchProject } = useContext(ProjectContext);
   const [backends, setBackends] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
 
   const fetchBackends = useCallback(async () => {
@@ -98,51 +100,48 @@ export const MachineLearningSettings = () => {
   return (
     <Block name="ml-settings">
       <Elem name={"wrapper"}>
-        {loading && <Spinner size={32} />}
-        {loaded && backends.length === 0 && (
+        <h1>{t('settings.ml.title')}</h1>
+        <Description>{t('settings.ml.description')}</Description>
+
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
+            <Spinner size={32} />
+          </div>
+        ) : backends.length === 0 ? (
           <EmptyState
             icon={<IconModels />}
-            title="Let’s connect your first model"
-            description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
-            action={
-              <Button primary onClick={() => showMLFormModal()}>
-                Connect Model
+            title={t('settings.ml.empty.title')}
+            description={t('settings.ml.empty.description')}
+            button={
+              <Button look="primary" onClick={() => showMLFormModal()}>
+                {t('settings.ml.empty.addButton')}
               </Button>
             }
-            footer={
-              <div>
-                Need help?
-                <br />
-                <a href="https://labelstud.io/guide/ml" target="_blank" rel="noreferrer">
-                  Learn more about connecting models in our docs
-                </a>
-              </div>
-            }
+          />
+        ) : (
+          <MachineLearningList
+            onEdit={(backend) => showMLFormModal(backend)}
+            onTestRequest={(backend) => showRequestModal(backend)}
+            onStartTraining={(backend) => startTrainingModal(backend)}
+            fetchBackends={fetchBackends}
+            backends={backends}
           />
         )}
-        <MachineLearningList
-          onEdit={(backend) => showMLFormModal(backend)}
-          onTestRequest={(backend) => showRequestModal(backend)}
-          onStartTraining={(backend) => startTrainingModal(backend)}
-          fetchBackends={fetchBackends}
-          backends={backends}
-        />
 
         {backends.length > 0 && (
           <>
             <Description>
-              A connected model has been detected! If you wish to fetch predictions from this model, please follow these
-              steps:
+              {t('settings.ml.connectedModel.description')}
               <br />
               <br />
-              1. Navigate to the <i>Data Manager</i>.<br />
-              2. Select the desired tasks.
+              1. {t('settings.ml.connectedModel.step1')}<br />
+              2. {t('settings.ml.connectedModel.step2')}
               <br />
-              3. Click on <i>Retrieve predictions</i> from the <i>Actions</i> menu.
+              3. {t('settings.ml.connectedModel.step3')}
             </Description>
             <Description>
-              If you want to use the model predictions for prelabeling, please configure this in the{" "}
-              <NavLink to="annotation">Annotation settings</NavLink>.
+              {t('settings.ml.prelabeling.description')}{" "}
+              <NavLink to="annotation">{t('settings.ml.prelabeling.link')}</NavLink>.
             </Description>
           </>
         )}
@@ -155,12 +154,12 @@ export const MachineLearningSettings = () => {
         >
           {backends.length > 0 && (
             <Form.Row columnCount={1}>
-              <Label text="Configuration" large />
+              <Label text={t('settings.ml.configuration')} large />
 
               <div>
                 <Toggle
-                  label="Start model training on annotation submission"
-                  description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
+                  label={t('settings.ml.training.label')}
+                  description={t('settings.ml.training.description')}
                   name="start_training_on_annotation_update"
                 />
               </div>
@@ -170,10 +169,10 @@ export const MachineLearningSettings = () => {
           {backends.length > 0 && (
             <Form.Actions>
               <Form.Indicator>
-                <span case="success">Saved!</span>
+                <span case="success">{t('common.saved')}</span>
               </Form.Indicator>
               <Button type="submit" look="primary" style={{ width: 120 }}>
-                Save
+                {t('common.save')}
               </Button>
             </Form.Actions>
           )}
@@ -183,5 +182,5 @@ export const MachineLearningSettings = () => {
   );
 };
 
-MachineLearningSettings.title = "Model";
+MachineLearningSettings.title = "机器学习模型";
 MachineLearningSettings.path = "/ml";

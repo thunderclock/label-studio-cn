@@ -6,11 +6,13 @@ import { BemWithSpecifiContext } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Menu } from "../Menu/Menu";
+import { useTranslation } from 'react-i18next';
 import "./Breadcrumbs.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
 export const Breadcrumbs = () => {
+  const { t } = useTranslation();
   const config = useConfig();
   const reactBreadcrumbs = useBreadcrumbs();
   const findComponent = useFindRouteComponent();
@@ -38,7 +40,7 @@ export const Breadcrumbs = () => {
 
           const title = (
             <Elem tag="span" name="label" mod={{ faded: index === item.length - 1 }}>
-              {item.title}
+              {t(item.title)}
             </Elem>
           );
 
@@ -49,7 +51,7 @@ export const Breadcrumbs = () => {
                   return (
                     <Menu.Item
                       key={`${index}-${item.title}`}
-                      label={sub.title}
+                      label={t(sub.title)}
                       icon={sub.icon}
                       href={sub.href ?? sub.path}
                       active={sub.active}

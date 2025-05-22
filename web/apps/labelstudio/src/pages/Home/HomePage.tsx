@@ -30,11 +30,7 @@ const resources = [
   {
     title: "LabelStud.io Blog",
     url: "https://labelstud.io/blog/",
-  },
-  {
-    title: "Slack Community",
-    url: "https://slack.labelstud.io",
-  },
+  }
 ];
 
 const actions = [
@@ -148,28 +144,9 @@ export const HomePage: Page = () => {
         </section>
         <section className="flex flex-col gap-6">
           <HeidiTips collection="projectSettings" />
-          <SimpleCard title={t('resources.title')} description={t('resources.description')}>
-            <ul>
-              {resources.map((link) => {
-                return (
-                  <li key={link.title}>
-                    <a
-                      href={link.url}
-                      className="py-2 px-1 flex justify-between items-center text-neutral-content"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {link.title}
-                      <IconExternal className="text-primary-icon" />
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </SimpleCard>
           <div className="flex gap-2 items-center">
             <IconHumanSignal />
-            <span className="text-neutral-content-subtle">{t('common.version')}: Community</span>
+            <span className="text-neutral-content-subtle">{t('common.version')}: AIP平台</span>
           </div>
         </section>
       </div>
