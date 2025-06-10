@@ -256,28 +256,36 @@ class KeycloakAuthenticationMiddleware:
     
     def __init__(self, get_response):
         self.get_response = get_response
+        logger.info("KeycloakAuthenticationMiddleware initialized")
 
     def __call__(self, request):
         from django.contrib.auth import get_user_model
         from django.contrib.auth.hashers import make_password
 
+        logger.info("KeycloakAuthenticationMiddleware processing request: %s %s", request.method, request.path)
+        logger.info("Request headers: %s", request.META)
+
         User = get_user_model()
 
         # Skip if user is already authenticated
         if request.user.is_authenticated:
+            logger.info("User already authenticated: %s", request.user)
             return self.get_response(request)
 
         # Get user info from Nginx headers
         username = request.META.get('HTTP_X_AUTH_REQUEST_USER')
         email = request.META.get('HTTP_X_AUTH_REQUEST_EMAIL')
+        logger.info("Keycloak headers: username=%s, email=%s", username, email)
 
         if not username or not email:
+            logger.info("Missing Keycloak headers: username=%s, email=%s", username, email)
             return self.get_response(request)
 
         try:
             # Try to get existing user
             try:
                 user = User.objects.get(email=email)
+                logger.info("Found existing user: %s", user)
             except User.DoesNotExist:
                 # Create new user if doesn't exist
                 user = User.objects.create(
@@ -285,13 +293,15 @@ class KeycloakAuthenticationMiddleware:
                     username=username,
                     password=make_password(username)  # Set password same as username
                 )
+                logger.info("Created new user: %s", user)
 
             # Set user in request
             request.user = user
             request.is_nginx_auth = True
+            logger.info("Set request.user to: %s", user)
 
         except Exception as e:
             # Log error but don't block request
-            logger.error(f'Nginx authentication failed: {str(e)}')
+            logger.info(f'Nginx authentication failed: {str(e)}', exc_info=True)
             
         return self.get_response(request)
