@@ -153,7 +153,7 @@ export default {
       training: {
         label: '在提交标注时开始模型训练',
         description: '此选项将向 /train 发送包含标注信息的请求。您可以使用此功能启用主动学习循环。您也可以通过模型卡片中的模型菜单手动开始训练。'
-      }
+        }
     },
     storage: {
       title: '云存储',

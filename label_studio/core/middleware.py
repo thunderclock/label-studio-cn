@@ -249,3 +249,49 @@ class HumanSignalCspMiddleware(CSPMiddleware):
                 del response['Content-Security-Policy-Report-Only']
             delattr(response, '_override_report_only_csp')
         return response
+
+
+class KeycloakAuthenticationMiddleware:
+    """Middleware that handles authentication via Nginx X-Auth-Request headers"""
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        from django.contrib.auth import get_user_model
+        from django.contrib.auth.hashers import make_password
+
+        User = get_user_model()
+
+        # Skip if user is already authenticated
+        if request.user.is_authenticated:
+            return self.get_response(request)
+
+        # Get user info from Nginx headers
+        username = request.META.get('HTTP_X_AUTH_REQUEST_USER')
+        email = request.META.get('HTTP_X_AUTH_REQUEST_EMAIL')
+
+        if not username or not email:
+            return self.get_response(request)
+
+        try:
+            # Try to get existing user
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                # Create new user if doesn't exist
+                user = User.objects.create(
+                    email=email,
+                    username=username,
+                    password=make_password(username)  # Set password same as username
+                )
+
+            # Set user in request
+            request.user = user
+            request.is_nginx_auth = True
+
+        except Exception as e:
+            # Log error but don't block request
+            logger.error(f'Nginx authentication failed: {str(e)}')
+            
+        return self.get_response(request)

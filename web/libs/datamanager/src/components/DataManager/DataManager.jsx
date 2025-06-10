@@ -47,7 +47,7 @@ const switchInjector = inject(({ store }) => {
 const ProjectSummary = summaryInjector(
   observer(({ totalTasks, totalFoundTasks, totalAnnotations, totalPredictions, cloudSync }) => {
     const { t } = useTranslation();
-    return (
+  return (
       <Space size="small">
         <Interface name="summary">
           <Space size="small">
@@ -56,10 +56,10 @@ const ProjectSummary = summaryInjector(
             <span>{t('projects.summary.annotations', { count: totalAnnotations })}</span>
             <span>{t('projects.summary.predictions', { count: totalPredictions })}</span>
             {cloudSync && <span>{t('projects.summary.syncing')}</span>}
-          </Space>
+        </Space>
         </Interface>
-      </Space>
-    );
+    </Space>
+  );
   }),
 );
 

@@ -21,18 +21,18 @@ const sidebarInjector = inject(({ store }) => {
 export const FiltersSidebar = sidebarInjector(
   observer(({ viewsStore, sidebarEnabled, sidebarVisible }) => {
     const { t } = useTranslation();
-    return sidebarEnabled && sidebarVisible ? (
-      <Block name="filters-sidebar">
-        <Elem name="header">
-          <Elem name="extra">
-            <Button
-              type="link"
-              icon={<Icon icon={IconChevronLeft} width={24} height={24} />}
-              onClick={() => viewsStore.collapseFilters()}
-            />
-          </Elem>
-          <Elem name="title">{t('projects.filters.title')}</Elem>
+  return sidebarEnabled && sidebarVisible ? (
+    <Block name="filters-sidebar">
+      <Elem name="header">
+        <Elem name="extra">
+          <Button
+            type="link"
+            icon={<Icon icon={IconChevronLeft} width={24} height={24} />}
+            onClick={() => viewsStore.collapseFilters()}
+          />
         </Elem>
+          <Elem name="title">{t('projects.filters.title')}</Elem>
+      </Elem>
         <Space size="small" direction="vertical">
           <Space size="small">
             <Button
@@ -58,9 +58,9 @@ export const FiltersSidebar = sidebarInjector(
             }}
           />
         </Space>
-        <Filters sidebar={true} />
-      </Block>
-    ) : null;
+      <Filters sidebar={true} />
+    </Block>
+  ) : null;
   }),
 );
 FiltersSidebar.displayName = "FiltersSidebar";

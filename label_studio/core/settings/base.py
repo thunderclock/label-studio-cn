@@ -250,6 +250,7 @@ MIDDLEWARE = [
     'core.middleware.DatabaseIsLockedRetryMiddleware',
     'core.current_request.ThreadLocalMiddleware',
     'jwt_auth.middleware.JWTAuthenticationMiddleware',
+    'core.middleware.KeycloakAuthenticationMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -820,3 +821,9 @@ if CI:
     }
 
 LOGOUT_REDIRECT_URL = get_env('LOGOUT_REDIRECT_URL', None)
+
+# Keycloak SSO Settings
+KEYCLOAK_SERVER_URL = get_env('KEYCLOAK_SERVER_URL', 'http://localhost:8080')
+KEYCLOAK_REALM = get_env('KEYCLOAK_REALM', 'master')
+KEYCLOAK_CLIENT_ID = get_env('KEYCLOAK_CLIENT_ID', 'label-studio')
+KEYCLOAK_CLIENT_SECRET = get_env('KEYCLOAK_CLIENT_SECRET', '')
