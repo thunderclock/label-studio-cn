@@ -3,12 +3,13 @@
 import logging
 import time
 from uuid import uuid4
+import os
 
 import ujson as json
 from core.utils.contextlog import ContextLog
 from csp.middleware import CSPMiddleware
 from django.conf import settings
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.core.exceptions import MiddlewareNotUsed
 from django.core.handlers.base import BaseHandler
 from django.http import HttpResponsePermanentRedirect
@@ -16,6 +17,9 @@ from django.middleware.common import CommonMiddleware
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
+import requests
+from django.shortcuts import redirect
+from organizations.models import Organization, OrganizationMember
 
 logger = logging.getLogger(__name__)
 
@@ -252,18 +256,22 @@ class HumanSignalCspMiddleware(CSPMiddleware):
 
 
 class KeycloakAuthenticationMiddleware:
-    """Middleware that handles authentication via Nginx X-Auth-Request headers"""
+    """Middleware that handles authentication via Keycloak token in cookie"""
     
     def __init__(self, get_response):
         self.get_response = get_response
         logger.info("KeycloakAuthenticationMiddleware initialized")
+        self.keycloak_server_url = os.getenv('KEYCLOAK_SERVER_URL', 'https://keycloak.local.moojnn.com')
+        logger.info("Keycloak server URL: %s", self.keycloak_server_url)
 
     def __call__(self, request):
-        from django.contrib.auth import get_user_model
+        from django.contrib.auth import get_user_model, login
         from django.contrib.auth.hashers import make_password
+        from django.contrib.auth.backends import ModelBackend
+        import requests
 
         logger.info("KeycloakAuthenticationMiddleware processing request: %s %s", request.method, request.path)
-        logger.info("Request headers: %s", request.META)
+        logger.info("Request cookies: %s", request.COOKIES)
 
         User = get_user_model()
 
@@ -272,16 +280,32 @@ class KeycloakAuthenticationMiddleware:
             logger.info("User already authenticated: %s", request.user)
             return self.get_response(request)
 
-        # Get user info from Nginx headers
-        username = request.META.get('HTTP_X_AUTH_REQUEST_USER')
-        email = request.META.get('HTTP_X_AUTH_REQUEST_EMAIL')
-        logger.info("Keycloak headers: username=%s, email=%s", username, email)
-
-        if not username or not email:
-            logger.info("Missing Keycloak headers: username=%s, email=%s", username, email)
+        # Get token from cookie
+        token = request.COOKIES.get('kc-access')
+        if not token:
+            logger.info("No kc-access token found in cookies")
             return self.get_response(request)
 
         try:
+            # Request userinfo from Keycloak
+            headers = {'Authorization': f'Bearer {token}'}
+            userinfo_url = f"{self.keycloak_server_url}/realms/aip/protocol/openid-connect/userinfo"
+            logger.info("Requesting userinfo from: %s", userinfo_url)
+            
+            response = requests.get(userinfo_url, headers=headers, verify=False)
+            response.raise_for_status()
+            userinfo = response.json()
+            
+            logger.info("Received userinfo: %s", userinfo)
+            
+            # Extract user info
+            email = userinfo.get('email')
+            username = userinfo.get('preferred_username') or userinfo.get('sub')
+            
+            if not email or not username:
+                logger.error("Missing email or username in userinfo response")
+                return self.get_response(request)
+
             # Try to get existing user
             try:
                 user = User.objects.get(email=email)
@@ -295,13 +319,56 @@ class KeycloakAuthenticationMiddleware:
                 )
                 logger.info("Created new user: %s", user)
 
-            # Set user in request
+                # 创建默认组织并添加用户为成员
+                try:
+                    # 获取或创建默认组织
+                    org, created = Organization.objects.get_or_create(
+                        title='Default Organization',
+                        defaults={'created_by': user}
+                    )
+                    if not created:
+                        # 如果组织已存在，更新创建者
+                        org.created_by = user
+                        org.save()
+                    logger.info("Got or created default organization: %s", org)
+
+                    # 添加用户为组织成员
+                    member = OrganizationMember.objects.create(
+                        organization=org,
+                        user=user
+                    )
+                    logger.info("Added user to organization as member: %s", member)
+
+                    # 设置用户的活跃组织
+                    user.active_organization = org
+                    user.save()
+                    logger.info("Set user's active organization to: %s", org)
+
+                except Exception as e:
+                    logger.error("Failed to create organization membership: %s", str(e), exc_info=True)
+
+            # Set user in request and login
             request.user = user
-            request.is_nginx_auth = True
+            request.is_keycloak_auth = True
+            
+            # Update session for Keycloak authenticated users
+            if hasattr(request, 'session'):
+                # 使用 ModelBackend 作为认证后端
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                request.session['last_login'] = time.time()
+                request.session.set_expiry(settings.MAX_SESSION_AGE)
+                logger.info("Updated session for Keycloak user: %s", user)
+            
             logger.info("Set request.user to: %s", user)
 
+            # 如果是登录页面，重定向到首页
+            if request.path == '/user/login/':
+                logger.info("Redirecting from login page to home page")
+                return redirect('https://aip.local.moojnn.com')
+
+        except requests.exceptions.RequestException as e:
+            logger.error("Failed to get userinfo from Keycloak: %s", str(e), exc_info=True)
         except Exception as e:
-            # Log error but don't block request
-            logger.info(f'Nginx authentication failed: {str(e)}', exc_info=True)
+            logger.error("Keycloak authentication failed: %s", str(e), exc_info=True)
             
         return self.get_response(request)

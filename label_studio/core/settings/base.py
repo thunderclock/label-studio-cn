@@ -233,6 +233,7 @@ INSTALLED_APPS = [
     'jwt_auth',
 ]
 
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -253,10 +254,13 @@ MIDDLEWARE = [
     'core.middleware.KeycloakAuthenticationMiddleware',
 ]
 
+
+# 在MIDDLEWARE定义前添加日志
+logger.info("Loading middleware list: %s", MIDDLEWARE)
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'jwt_auth.auth.TokenAuthenticationPhaseout',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
@@ -544,7 +548,7 @@ BATCH_SIZE = 1000
 PROJECT_TITLE_MIN_LEN = 3
 PROJECT_TITLE_MAX_LEN = 50
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/user/login/'
+LOGIN_URL = None  # 设置为 None 以避免 Django 的默认重定向行为
 MIN_GROUND_TRUTH = 10
 DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
@@ -827,3 +831,9 @@ KEYCLOAK_SERVER_URL = get_env('KEYCLOAK_SERVER_URL', 'http://localhost:8080')
 KEYCLOAK_REALM = get_env('KEYCLOAK_REALM', 'master')
 KEYCLOAK_CLIENT_ID = get_env('KEYCLOAK_CLIENT_ID', 'label-studio')
 KEYCLOAK_CLIENT_SECRET = get_env('KEYCLOAK_CLIENT_SECRET', '')
+
+# 禁用 Django 的登录视图，使用 Keycloak 认证
+USE_DJANGO_LOGIN = False
+
+# 禁用 JWT 认证
+USE_JWT_AUTH = False
